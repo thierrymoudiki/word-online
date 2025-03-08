@@ -1,5 +1,6 @@
 import numpy as np
 import gensim
+import time  # Added for the delay parameter
 
 from collections import deque
 from tqdm import tqdm
@@ -72,7 +73,7 @@ def sample_from_logits(logits, k=5, temperature=1.0, random_seed=123):
     return np.random.choice(top_k_indices, p=top_k_probs)
 
 
-def generate_text(seed="this is", length=20, k=5, temperature=1.0, random_state=123):
+def generate_text(seed="this is", length=20, k=5, temperature=1.0, random_state=123, delay=3):
     seed_words = seed.lower().split()
 
     # Ensure context has `context_size` words (pad with zero vectors if needed)
@@ -97,6 +98,10 @@ def generate_text(seed="this is", length=20, k=5, temperature=1.0, random_state=
         # Sample next word using Top-K & Temperature scaling
         pred_idx = sample_from_logits(logits, k=k, temperature=temperature)
         next_word = idx_to_word.get(pred_idx, "<PAD>")
+        
+        print(f"Generating next word: {next_word}")  # Added this line
+        time.sleep(delay)  # Added this line
+        
         if previous_word[-1] == "." and previous_word[-1] != "" and previous_word[-1] != seed:
           generated += " " + next_word.capitalize()
         else: 
@@ -108,4 +113,6 @@ def generate_text(seed="this is", length=20, k=5, temperature=1.0, random_state=
 
 # 🔥 Generate text
 print("\n\n Generated Text:")
-print(generate_text("This is a", length=12, k=1))
+seed = "This is a"
+print(seed)
+print(generate_text(seed, length=12, k=1, delay=5)) # delay seconds for next word generation, optimal for delay=0 seconds 
